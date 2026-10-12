@@ -277,10 +277,22 @@
     }
     ctx.drawImage(img,0,0,w,h);
     const q = Number(quality.value) / 100;
-    const blob = await canvasToBlob(canvas, type, q);
-    canvas.width = 0; canvas.height = 0;
-    return {file, blob, width:w, height:h, type};
-  }
+    let blob = await canvasToBlob(canvas, type, q);
+
+// 크기를 변경하지 않았는데 결과가 더 크면 원본 사용
+if (
+blob.size > file.size &&
+w === img.naturalWidth &&
+h === img.naturalHeight
+) {
+blob = file;
+type = file.type;
+}
+
+canvas.width = 0;
+canvas.height = 0;
+
+return {file, blob, width:w, height:h, type};
   function makeResultCard(result) {
     const {file,blob,width,height,type} = result;
     const url = URL.createObjectURL(blob);
